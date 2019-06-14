@@ -1,5 +1,5 @@
 import ApolloClient from 'apollo-boost'
 
 export const client = new ApolloClient({
-  uri: './netlify/functions/graphql',
+  uri: '/.netlify/functions/graphql',
 })

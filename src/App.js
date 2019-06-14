@@ -1,50 +1,37 @@
-import React, { Component } from "react"
-import logo from "./logo.svg"
-import "./App.css"
+import React from 'react'
 
-class LambdaDemo extends Component {
-  constructor(props) {
-    super(props)
-    this.state = { loading: false, msg: null }
+import { useQuery } from '@apollo/react-hooks'
+import gql from 'graphql-tag'
+
+export const HELLO_QUERY = gql`
+  query HELLO_QUERY {
+    hello
   }
+`
 
-  handleClick = api => e => {
-    e.preventDefault()
-
-    this.setState({ loading: true })
-    fetch("/.netlify/functions/" + api)
-      .then(response => response.json())
-      .then(json => this.setState({ loading: false, msg: json.msg }))
-  }
-
-  render() {
-    const { loading, msg } = this.state
-
-    return (
-      <p>
-        <button onClick={this.handleClick("hello")}>{loading ? "Loading..." : "Call Lambda"}</button>
-        <button onClick={this.handleClick("async-dadjoke")}>{loading ? "Loading..." : "Call Async Lambda"}</button>
-        <br />
-        <span>{msg}</span>
-      </p>
-    )
-  }
+function Loading() {
+  return <p>Loading...</p>
 }
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <LambdaDemo />
-        </header>
-      </div>
-    )
-  }
+function Error({ error }) {
+  return (
+    <p>
+      <strong>Error: {error.message}</strong>
+    </p>
+  )
 }
 
-export default App
+function LambdaDemo() {
+  const { error, loading, data } = useQuery(HELLO_QUERY)
+  return (
+    <>
+      {loading && <Loading />}
+      {error && <Error error={error} />}
+      {data && data.hello && <h3>{data.hello}</h3>}
+    </>
+  )
+}
+
+export default function App() {
+  return <LambdaDemo />
+}
